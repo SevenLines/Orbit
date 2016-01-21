@@ -1,19 +1,9 @@
-#cmake_minimum_required(VERSION 3.3)
-#project(orbit2)
-#
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#
-#set(SOURCE_FILES main.cpp)
-#include_directories(3rdparty/oxygine-framework/oxygine)
-#add_executable(orbit2 ${SOURCE_FILES})
-
 cmake_minimum_required (VERSION 3.2)
 project (orbit2)
 
 find_package(Boost)
 
 add_subdirectory(3rdparty/oxygine-framework/ oxygine-framework)
-add_subdirectory(3rdparty/oxygine-sound/ oxygine-sound)
 add_definitions(${OXYGINE_DEFINITIONS})
 
 include_directories(${OXYGINE_INCLUDE_DIRS})
@@ -21,8 +11,8 @@ include_directories(3rdparty/nanovg/src)
 
 link_directories(${OXYGINE_LIBRARY_DIRS})
 
-link_directories(libs/linux64/)
-link_libraries(GL GLU m GLEW)
+#link_directories(libs/linux64/)
+#link_libraries(GL GLU m GLEW)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_executable(orbit2 src/main.cpp src/game.cpp
