@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="31.246033mm"
+   height="31.246033mm"
+   viewBox="0 0 110.71429 110.71429"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="resources.svg"
+   inkscape:export-filename="earth.png"
+   inkscape:export-xdpi="70"
+   inkscape:export-ydpi="70">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="166.28858"
+     inkscape:cy="10.732391"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:bbox-paths="true" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-149.28571,-90.933628)"
+     style="display:inline">
+    <circle
+       style="opacity:1;fill:#5599ff;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="earth"
+       cx="204.64285"
+       cy="146.29077"
+       r="55.357143"
+       inkscape:export-filename="images/earth.png"
+       inkscape:export-xdpi="325.16"
+       inkscape:export-ydpi="325.16"
+       inkscape:label="#earth" />
+    <circle
+       style="opacity:1;fill:#ff5599;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="path4176"
+       cx="299.55356"
+       cy="136.7372"
+       r="5.4464288"
+       inkscape:export-filename="./images/mark.png"
+       inkscape:export-xdpi="70"
+       inkscape:export-ydpi="70" />
+    <circle
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#808080;stroke-opacity:1"
+       id="path4176-2"
+       cx="296.60715"
+       cy="179.32648"
+       r="5.4464288"
+       inkscape:export-filename="./images/rocket.png"
+       inkscape:export-xdpi="70"
+       inkscape:export-ydpi="70" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.68084681;stroke-opacity:1"
+       id="rect4144"
+       width="4.1409431"
+       height="4.2292995"
+       x="330.11597"
+       y="163.24118"
+       inkscape:export-filename="/home/mk/ClionProjects/orbit2/data/images/line.png"
+       inkscape:export-xdpi="21.734167"
+       inkscape:export-ydpi="21.734167" />
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="path4150"
+       sodipodi:sides="3"
+       sodipodi:cx="331.07141"
+       sodipodi:cy="152.00507"
+       sodipodi:r1="11.25"
+       sodipodi:r2="9.1014414"
+       sodipodi:arg1="-1.5707963"
+       sodipodi:arg2="-0.52359875"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 331.07141,140.75507 9.74279,16.875 -19.48557,0 z"
+       transform="matrix(0,0.32803759,-0.37878518,0,380.71604,42.169072)"
+       inkscape:export-filename="/home/mk/ClionProjects/orbit2/data/images/anchor.png"
+       inkscape:export-xdpi="281.60208"
+       inkscape:export-ydpi="281.60208"
+       inkscape:transform-center-x="-0.40691246" />
+    <rect
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="rect4149"
+       width="2.1502914"
+       height="3.8817239"
+       x="189.6339"
+       y="-315.17859"
+       inkscape:export-filename="./images/dashed.png"
+       inkscape:export-xdpi="44.461063"
+       inkscape:export-ydpi="44.461063"
+       transform="matrix(0,1,-1,0,0,0)" />
+    <rect
+       style="display:inline;opacity:1;fill:none;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="rect4149-9"
+       width="2.1502914"
+       height="3.8817239"
+       x="189.6339"
+       y="-319.0603"
+       inkscape:export-filename="./images/dashed.png"
+       inkscape:export-xdpi="44.461063"
+       inkscape:export-ydpi="44.461063"
+       transform="matrix(0,1,-1,0,0,0)" />
+    <rect
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="rect4149-5"
+       width="2.1502914"
+       height="7.7634377"
+       x="193.48882"
+       y="-319.0603"
+       inkscape:export-filename="./images/line_2.png"
+       inkscape:export-xdpi="44.461063"
+       inkscape:export-ydpi="44.461063"
+       transform="matrix(0,1,-1,0,0,0)" />
+  </g>
+</svg>

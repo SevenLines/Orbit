@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<resources>
+	<set path = "images" />
+	<atlas>
+		<image file="anim.png" cols = "7" />
+		<image file="button.png"/>
+		<image file="supergirl.jpeg"/>
+		<image file="earth.png"/>
+		<image file="rocket.png"/>
+		<image file="mark.png"/>
+		<image file="anchor.png"/>
+		<image file="line.png"/>
+		<image file="line_2.png"/>
+		<image file="dashed.png"/>
+	</atlas>
+
+	<set path = "fonts" />
+	<font file="main.fnt" />	
+</resources>
