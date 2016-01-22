@@ -12,19 +12,17 @@
 #include "GlobalState.h"
 #include "Anchor.h"
 #include "Way.h"
+#include "WayNVG.h"
 
 using namespace oxygine;
 
 
-class Space : public Actor
-{
+class Space : public Actor {
 
 private:
 
     spPlayer player;
-    spPlanet planet;
-    spWay orbitWay;
-    spWay playerWay;
+    spWayNVG orbitWayNVG;
 
     GlobalState *globalState;
     bool touchDown;
@@ -34,14 +32,26 @@ private:
     Vector2 spacePosition;
 public:
     Space(Resources &gameResources, GlobalState *state);
+
     void zoom(float k);
 
 protected:
     virtual void doUpdate(const UpdateState &us) override;
+
     void showOrbit();
+
     spAnchor anchor;
 
+    void addPlanet(spPlanet planet, Vector2 position);
+
+    vector<spPlanet> planets;
+
+    tuple<Vector2, spPlanet> getNextPosition(double delta,
+                                             Vector2 objectPosition,
+                                             Vector2 &objectAcceleration,
+                                             Vector2 &objectVelocity);
 };
+
 //declare spMainActor as intrusive_ptr holder of Space
 typedef oxygine::intrusive_ptr<Space> spSpace;
 

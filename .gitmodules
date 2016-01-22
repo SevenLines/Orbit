@@ -4,3 +4,4 @@
 [submodule "3rdparty/oxygine-framework"]
 	path = 3rdparty/oxygine-framework
 	url = https://github.com/oxygine/oxygine-framework.git
+

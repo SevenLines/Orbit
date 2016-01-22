@@ -27,7 +27,7 @@ void Planet::doUpdate(const UpdateState &us) {
     planet->setRotation(angle);
 }
 
-bool Planet::isCollide(spRocket rocket) {
-    auto length = (getPosition() - rocket->getPosition()).length();
+bool Planet::isCollide(Vector2 position) {
+    auto length = (getPosition() - position).length();
     return length < radius;
 }

@@ -9,6 +9,5 @@
 #include <oxygine-framework.h>
 
 using namespace oxygine;
-typedef intrusive_ptr<NVGcontext> spNVGcontext;
 
 #endif //ORBIT2_TYPES_H

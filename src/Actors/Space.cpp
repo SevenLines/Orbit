@@ -4,6 +4,7 @@
 
 #include "Space.h"
 #include <boost/format.hpp>
+#include <iostream>
 
 using namespace oxygine;
 using namespace std;
@@ -14,58 +15,58 @@ void Space::doUpdate(const UpdateState &us) {
     Actor::doUpdate(us);
 
     auto playerPos = player->getPosition();
-    auto planetPos = planet->getPosition();
-
     auto delta = (float) us.dt / 1000;
-
-    auto distance = (planetPos - playerPos).length();
-    auto direct = (planetPos - playerPos).normalized();
-    auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
-
-
-    if (planet->isCollide(player)) {
-        player->setPosition(planet->getPosition() - direct * (planet->radius));
-        player->toggleLanded(true);
-
-        float k = planet->angle_velocity * planet->gravity;
-
-        player->velocity = Vector2(
-                direct.y * k,
-                -direct.x * k
-        ) + planet->velocity;
-    } else {
-        player->toggleLanded(false);
-    }
-
-    player->acceleration = gravityVector;
+//    auto planetPos = planet->getPosition();
+//
+//
+//    auto distance = (planetPos - playerPos).length();
+//    auto direct = (planetPos - playerPos).normalized();
+//    auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
+//
+//    player->acceleration = gravityVector;
+    player->acceleration = {0, 0};
+    auto velocityVector = player->velocity.normalized();
 
     if (this->globalState->keys_pressed[SDL_SCANCODE_A]) {
-        player->acceleration -= direct * 15;
+        player->acceleration += Vector2(velocityVector.y, -velocityVector.x) * 15;
     }
 
     if (this->globalState->keys_pressed[SDL_SCANCODE_D]) {
-        player->acceleration += direct * 15;
+        player->acceleration -= Vector2(velocityVector.y, -velocityVector.x) * 15;
     }
 
     if (this->globalState->keys_pressed[SDL_SCANCODE_W]) {
-        player->acceleration += player->velocity.normalized() * 15;
+        player->acceleration += velocityVector * 15;
     }
 
     if (this->globalState->keys_pressed[SDL_SCANCODE_S]) {
-        player->acceleration -= player->velocity.normalized() * 15;
+        player->acceleration -= velocityVector * 15;
     }
 
     if (addAcceleration.length()) {
         player->acceleration = addAcceleration;
     }
 
-    auto info = format("скорость: %1$.1f\nвысота: %2%;");
-    info % player->velocity.length() % (int) (distance - planet->radius);
-    player->edtInfo->setText(info.str());
+    auto acceleration = player->acceleration;
+    auto velocity = player->velocity;
+    spPlanet collidedPlanet;
+    Vector2 nextPosition;
 
-    player->velocity += player->acceleration * delta * player->accelerationEffeciency;
-    player->setPosition(player->getNextPosition(delta));
-    planet->setPosition(planet->getPosition() + planet->velocity * delta);
+    tie(nextPosition, collidedPlanet) = getNextPosition(delta, playerPos, acceleration, velocity);
+
+    player->setPosition(nextPosition);
+    player->velocity = velocity;
+    player->acceleration = acceleration;
+
+    player->toggleLanded(bool(collidedPlanet));
+//
+    auto info = format("скорость: %1$.1f\nвысота: %2%;");
+    info % player->velocity.length() % 0;
+    player->edtInfo->setText(info.str());
+//
+//    player->velocity += player->acceleration * delta * player->accelerationEffeciency;
+//    player->setPosition(player->getNextPosition(delta));
+//    planet->setPosition(planet->getPosition() + planet->velocity * delta);
 
     showOrbit();
 }
@@ -73,16 +74,16 @@ void Space::doUpdate(const UpdateState &us) {
 Space::Space(Resources &gameResources, GlobalState *state) {
     globalState = state;
 
-    planet = new Planet(gameResources, 150);
-    planet->velocity = Vector2{1, 1};
+    spPlanet planet = new Planet(gameResources, 150);
+    addPlanet(planet, getStage()->getSize() / 2);
+    addPlanet(new Planet(gameResources, 100), getStage()->getSize() / 2 + Vector2{800, 0});
+
     player = new Player(gameResources);
-    orbitWay = new Way(&gameResources, "line_2", false);
+    orbitWayNVG = new WayNVG(&gameResources);
 
-    addChild(orbitWay);
-    addChild(planet);
     addChild(player);
+    getStage()->addChild(orbitWayNVG);
 
-    planet->setPosition(getStage()->getSize() / 2);
     player->setPosition(planet->getPosition() + planet->getSize() + Vector2(-planet->radius, 0));
 
     auto callback = [=](Event *event) {
@@ -140,38 +141,82 @@ void Space::zoom(float k) {
 }
 
 void Space::showOrbit() {
-    Vector2 playerPos = player->getPosition();
-    Vector2 planetPos = planet->getPosition();
-    Vector2 lastPos = playerPos;
-
-    Vector2 acceleration = player->acceleration;
-    Vector2 velocity = player->velocity;
-    auto delta = 1.0f / 100;
-    int i = 0;
-
-    orbitWay->clear();
-    orbitWay->minLength = 5;
-    orbitWay->setPosition(player->getPosition());
+    orbitWayNVG->clear();
 
     if (player->getLanded()) {
         return;
     }
 
+    auto delta = 0.01;
+    int i = 0;
+
+    Vector2 playerPos = player->getPosition();
+    Vector2 lastPos = playerPos;
+    orbitWayNVG->addPoint(local2global(playerPos));
+
+    Vector2 acceleration = player->acceleration;
+    Vector2 velocity = player->velocity;
+
     while (i < 10000) {
-        auto distance = (planetPos - playerPos).length();
-        auto direct = (planetPos - playerPos).normalized();
-        auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
+        acceleration = {0, 0};
+        spPlanet collidedPlanet;
+        tie(playerPos, collidedPlanet) = getNextPosition(delta, playerPos, acceleration, velocity);
 
-        acceleration = gravityVector;
-
-        velocity += acceleration * delta * player->accelerationEffeciency;
-        playerPos = playerPos + velocity * delta ;
-        planetPos = planet->getPosition() + planet->velocity * delta;
-
-        orbitWay->addPoint(playerPos);
-        if (i > 0 && abs((player->getPosition() - playerPos).length()) < 0.1) {
+        if (collidedPlanet) {
             break;
+        }
+
+        if ((lastPos - playerPos).length() > 10) {
+            orbitWayNVG->addPoint(local2global(playerPos), WayPointType::Default);
+            lastPos = playerPos;
         }
         ++i;
     }
+}
+
+
+tuple<Vector2, spPlanet>
+Space::getNextPosition(double delta,
+                       Vector2 objectPosition,
+                       Vector2 &objectAcceleration,
+                       Vector2 &objectVelocity) {
+    spPlanet collidedPlanet;
+    for (auto planet : planets) {
+        Vector2 planetPos = planet->getPosition();
+
+        auto direct = (planetPos - objectPosition).normalized();
+        auto distance = (planetPos - objectPosition).length();
+        auto angle = atan2(direct.x, direct.y);
+        auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
+
+        if (planet->isCollide(objectPosition)) {
+            objectPosition = planet->getPosition() - direct * (planet->radius);
+
+            collidedPlanet = planet;
+
+            float k = planet->angle_velocity * planet->gravity;
+
+            objectVelocity = Vector2(
+                    direct.y * k,
+                    -direct.x * k
+            ) + planet->velocity;
+
+            objectAcceleration += gravityVector;
+
+            break;
+        } else {
+        }
+
+        objectAcceleration += gravityVector;
+    }
+    objectPosition = objectPosition + objectVelocity * delta;
+    objectVelocity += objectAcceleration * delta;
+
+    return make_tuple(objectPosition, collidedPlanet);
+}
+
+void Space::addPlanet(spPlanet planet, Vector2 position) {
+    planets.push_back(planet);
+    planet->setPosition(position);
+    addChild(planet);
 }

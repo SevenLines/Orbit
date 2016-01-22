@@ -20,7 +20,6 @@ private:
     ResAnim *lineSprite;
 //    NVGcontext *nvGcontext;
 
-    vector<Vector2> points;
 
     bool hide;
 public:
@@ -28,9 +27,9 @@ public:
     float minLength;
     Way(Resources *resources, string spriteName="dashed", bool hide=true);
 
-    void addPoint(Vector2 point);
+    virtual void addPoint(Vector2 point);
 
-    void clear();
+    virtual void clear();
 
 
     virtual ~Way();

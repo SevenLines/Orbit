@@ -22,7 +22,7 @@ public:
     float radius;
     float gravity;
 
-    bool isCollide(spRocket rocket);
+    bool isCollide(Vector2 position);
 
     float angle_velocity;
 protected:

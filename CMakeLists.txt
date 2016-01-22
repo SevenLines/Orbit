@@ -3,7 +3,7 @@ project (orbit2)
 
 find_package(Boost)
 
-add_subdirectory(3rdparty/oxygine-framework/ oxygine-framework)
+add_subdirectory(3rdparty/oxygine-framework/)
 add_definitions(${OXYGINE_DEFINITIONS})
 
 include_directories(${OXYGINE_INCLUDE_DIRS})
@@ -12,7 +12,7 @@ include_directories(3rdparty/nanovg/src)
 link_directories(${OXYGINE_LIBRARY_DIRS})
 
 #link_directories(libs/linux64/)
-#link_libraries(GL GLU m GLEW)
+link_libraries(GL GLU m GLEW)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_executable(orbit2 src/main.cpp src/game.cpp
@@ -23,7 +23,12 @@ add_executable(orbit2 src/main.cpp src/game.cpp
         src/Actors/Player.h src/Actors/GlobalState.cpp
         src/Actors/GlobalState.h
         3rdparty/nanovg/src/nanovg.c
-        src/Actors/Anchor.cpp src/Actors/Anchor.h src/Actors/Way.cpp src/Actors/Way.h src/Helpers/Format.cpp src/Helpers/Format.h src/Actors/Body.cpp src/Actors/Body.h src/Helpers/types.cpp src/Helpers/types.h)
+        src/Actors/Anchor.cpp src/Actors/Anchor.h
+        src/Actors/Way.cpp src/Actors/Way.h
+        src/Actors/WayNVG.cpp src/Actors/WayNVG.h
+        src/Helpers/Format.cpp src/Helpers/Format.h
+        src/Actors/Body.cpp src/Actors/Body.h
+        src/Helpers/types.cpp src/Helpers/types.h)
 
 if (WIN32) #disable console mode for VC++
     set_target_properties(orbit2 PROPERTIES WIN32_EXECUTABLE TRUE)
