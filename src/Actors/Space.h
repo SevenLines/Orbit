@@ -46,10 +46,13 @@ protected:
 
     vector<spPlanet> planets;
 
-    tuple<Vector2, spPlanet, map<int, BodyInfo>> getNextPosition(double delta,
-                                             Vector2 objectPosition,
-                                             Vector2 &objectAcceleration,
-                                             Vector2 &objectVelocity);
+    tuple<Vector2, spPlanet> getNextPosition(
+            double delta,
+            Vector2 objectPosition,
+            Vector2 &objectAcceleration,
+            Vector2 &objectVelocity,
+            map<int, BodyInfo> &bodyInfoMap
+    );
 };
 
 //declare spMainActor as intrusive_ptr holder of Space

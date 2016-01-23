@@ -3,6 +3,7 @@
 //
 
 #include "Space.h"
+#include "../Helpers/Format.h"
 #include <boost/format.hpp>
 #include <iostream>
 
@@ -16,14 +17,7 @@ void Space::doUpdate(const UpdateState &us) {
 
     auto playerPos = player->getPosition();
     auto delta = (float) us.dt / 1000;
-//    auto planetPos = planet->getPosition();
-//
-//
-//    auto distance = (planetPos - playerPos).length();
-//    auto direct = (planetPos - playerPos).normalized();
-//    auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
-//
-//    player->acceleration = gravityVector;
+
     player->acceleration = {0, 0};
     auto velocityVector = player->velocity.normalized();
 
@@ -51,23 +45,35 @@ void Space::doUpdate(const UpdateState &us) {
     auto velocity = player->velocity;
     spPlanet collidedPlanet;
     Vector2 nextPosition;
-    map<int, BodyInfo> bodyInfos;
 
-    tie(nextPosition, collidedPlanet, bodyInfos) = getNextPosition(delta, playerPos, acceleration, velocity);
+    map<int, BodyInfo> bodyInfoMap;
+    for (auto planet : planets) {
+        bodyInfoMap.emplace(planet->getObjectID(), make_tuple(
+                planet->getPosition(),
+                planet->getVelocity(),
+                planet->getAcceleration()
+        ));
+    }
+    tie(nextPosition, collidedPlanet) = getNextPosition(delta, playerPos, acceleration, velocity, bodyInfoMap);
+
+    for (auto planet : planets) {
+        Vector2 planetPos, planetAcceleration, planetVelocity;
+        BodyInfo info = bodyInfoMap.at(planet->getObjectID());
+        tie(planetPos, planetVelocity, planetAcceleration) = info;
+        planet->setPosition(planetPos);
+        planet->setAcceleration(planetAcceleration);
+        planet->setVelocity(planetVelocity);
+    }
 
     player->setPosition(nextPosition);
     player->velocity = velocity;
     player->acceleration = acceleration;
 
     player->toggleLanded(bool(collidedPlanet));
-//
+
     auto info = format("скорость: %1$.1f\nвысота: %2%;");
     info % player->velocity.length() % 0;
     player->edtInfo->setText(info.str());
-//
-//    player->velocity += player->acceleration * delta * player->accelerationEffeciency;
-//    player->setPosition(player->getNextPosition(delta));
-//    planet->setPosition(planet->getPosition() + planet->velocity * delta);
 
     showOrbit();
 }
@@ -77,16 +83,13 @@ Space::Space(Resources &gameResources, GlobalState *state) {
 
     spPlanet basePlanet = new Planet(gameResources, 150);
     basePlanet->setGravity(10);
-//    basePlanet->setVelocity({1, 1});
+    basePlanet->setVelocity({1, 1});
     addPlanet(basePlanet, getStage()->getSize() / 2);
 
     spPlanet planet = new Planet(gameResources, 100);
-    planet->setGravity(100);
+    planet->setGravity(10);
+    basePlanet->setVelocity({-1, -1});
     addPlanet(planet, getStage()->getSize() / 2 + Vector2{800, 0});
-
-//    planet = new Planet(gameResources, 300);
-//    planet->setGravity(10.0f);
-//    addPlanet(planet, getStage()->getSize() / 2 + Vector2{800, 500});
 
     player = new Player(gameResources);
     orbitWayNVG = new WayNVG(&gameResources);
@@ -141,7 +144,7 @@ void Space::showOrbit() {
         return;
     }
 
-    auto delta = 0.01;
+    auto delta = 0.1;
     int i = 0;
 
     Vector2 playerPos = player->getPosition();
@@ -151,11 +154,19 @@ void Space::showOrbit() {
     Vector2 acceleration = player->acceleration;
     Vector2 velocity = player->velocity;
 
-    while (i < 10000) {
+    map<int, BodyInfo> bodyInfoMap;
+    for (auto planet : planets) {
+        bodyInfoMap.emplace(planet->getObjectID(), make_tuple(
+                planet->getPosition(),
+                planet->getVelocity(),
+                planet->getAcceleration()
+        ));
+    }
+
+    while (i < 1000) {
         acceleration = {0, 0};
         spPlanet collidedPlanet;
-        map<int, BodyInfo> bodyInfos;
-        tie(playerPos, collidedPlanet, bodyInfos) = getNextPosition(delta, playerPos, acceleration, velocity);
+        tie(playerPos, collidedPlanet) = getNextPosition(delta, playerPos, acceleration, velocity, bodyInfoMap);
 
         if (collidedPlanet) {
             break;
@@ -170,65 +181,57 @@ void Space::showOrbit() {
 }
 
 
-tuple<Vector2, spPlanet, map<int, BodyInfo>>
+tuple<Vector2, spPlanet>
 Space::getNextPosition(double delta,
                        Vector2 objectPosition,
                        Vector2 &objectAcceleration,
-                       Vector2 &objectVelocity) {
+                       Vector2 &objectVelocity,
+                       map<int, BodyInfo> &bodyInfoMap) {
     spPlanet collidedPlanet;
-
-
-    vector<BodyInfo> bodyInfos(planets.size());
-    map<int, BodyInfo> bodyInfoMap;
-
-    for (auto planet : planets) {
-        bodyInfoMap.emplace(planet->getObjectID(), make_tuple(
-                planet->getPosition(),
-                planet->getVelocity(),
-                planet->getAcceleration()
-        ));
-    }
+    bool collided = false;
 
     for (auto planet : planets) {
         Vector2 planetPos, planetAcceleration, planetVelocity;
         BodyInfo info = bodyInfoMap.at(planet->getObjectID());
-        tie(planetPos, planetAcceleration, planetVelocity) = info;
+        tie(planetPos, planetVelocity, planetAcceleration) = info;
 
-        auto direct = (planetPos - objectPosition).normalized();
-        auto distance = (planetPos - objectPosition).length();
-        auto angle = atan2(direct.x, direct.y);
-        auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
+        if (!collided) {
+            auto direct = (planetPos - objectPosition).normalized();
+            auto distance = (planetPos - objectPosition).length();
+            auto angle = atan2(direct.x, direct.y);
+            auto gravityVector = direct * planet->gravity / pow(distance / planet->radius, 2);
 
-        if (planet->isCollide(objectPosition)) {
-            objectPosition = planet->getPosition() - direct * (planet->radius);
+            if ((planetPos - objectPosition).length() < planet->radius) {
+                objectPosition = planetPos - direct * (planet->radius);
 
-            collidedPlanet = planet;
+                collidedPlanet = planet;
 
-            float k = planet->angle_velocity * planet->gravity;
+                float k = planet->angle_velocity * planet->gravity;
 
-            objectVelocity = Vector2(
-                    direct.y * k,
-                    -direct.x * k
-            ) + planet->velocity;
+                objectVelocity = Vector2(
+                        direct.y * k,
+                        -direct.x * k
+                ) + planet->velocity;
+
+                objectAcceleration += gravityVector;
+
+                collided = true;
+            }
 
             objectAcceleration += gravityVector;
-
-            break;
         }
 
-        objectAcceleration += gravityVector;
-
-        planetPos = planetPos + planetVelocity * delta;
         planetAcceleration = {0, 0};
+        planetPos = planetPos + planetVelocity * delta;
         planetVelocity += planetAcceleration * delta;
 
-        bodyInfoMap.at(planet->getObjectID())
-                = make_tuple(planetPos, planetAcceleration, planetVelocity);
+        bodyInfoMap[planet->getObjectID()]
+                = make_tuple(planetPos, planetVelocity, planetAcceleration);
     }
     objectPosition = objectPosition + objectVelocity * delta;
     objectVelocity += objectAcceleration * delta;
 
-    return make_tuple(objectPosition, collidedPlanet, bodyInfoMap);
+    return make_tuple(objectPosition, collidedPlanet);
 }
 
 void Space::addPlanet(spPlanet planet, Vector2 position) {
