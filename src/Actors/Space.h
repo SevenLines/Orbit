@@ -46,7 +46,7 @@ protected:
 
     vector<spPlanet> planets;
 
-    tuple<Vector2, spPlanet> getNextPosition(double delta,
+    tuple<Vector2, spPlanet, map<int, BodyInfo>> getNextPosition(double delta,
                                              Vector2 objectPosition,
                                              Vector2 &objectAcceleration,
                                              Vector2 &objectVelocity);

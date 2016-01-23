@@ -10,7 +10,7 @@ Planet::Planet(Resources &resources, float radius) {
     angle = 0;
     this->radius = radius;
     auto diameter = 2 * this->radius;
-    gravity = 9.8f;
+    setGravity(9.8);
 
     planet = new Sprite();
     planet->setResAnim(resources.getResAnim("earth"));
@@ -21,6 +21,8 @@ Planet::Planet(Resources &resources, float radius) {
     this->addChild(planet);
 }
 
+
+
 void Planet::doUpdate(const UpdateState &us) {
     Actor::doUpdate(us);
     angle += angle_velocity * us.dt / 1000;
@@ -30,4 +32,12 @@ void Planet::doUpdate(const UpdateState &us) {
 bool Planet::isCollide(Vector2 position) {
     auto length = (getPosition() - position).length();
     return length < radius;
+}
+
+float Planet::getGravity() const {
+    return gravity;
+}
+
+void Planet::setGravity(float gravity) {
+    Planet::gravity = gravity;
 }

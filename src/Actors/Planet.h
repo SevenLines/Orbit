@@ -28,6 +28,10 @@ public:
 protected:
     virtual void doUpdate(const UpdateState &us) override;
 
+public:
+    float getGravity() const;
+
+    void setGravity(float gravity);
 };
 typedef oxygine::intrusive_ptr<Planet> spPlanet;
 

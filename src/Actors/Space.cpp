@@ -51,8 +51,9 @@ void Space::doUpdate(const UpdateState &us) {
     auto velocity = player->velocity;
     spPlanet collidedPlanet;
     Vector2 nextPosition;
+    map<int, BodyInfo> bodyInfos;
 
-    tie(nextPosition, collidedPlanet) = getNextPosition(delta, playerPos, acceleration, velocity);
+    tie(nextPosition, collidedPlanet, bodyInfos) = getNextPosition(delta, playerPos, acceleration, velocity);
 
     player->setPosition(nextPosition);
     player->velocity = velocity;
@@ -74,9 +75,18 @@ void Space::doUpdate(const UpdateState &us) {
 Space::Space(Resources &gameResources, GlobalState *state) {
     globalState = state;
 
-    spPlanet planet = new Planet(gameResources, 150);
-    addPlanet(planet, getStage()->getSize() / 2);
-    addPlanet(new Planet(gameResources, 100), getStage()->getSize() / 2 + Vector2{800, 0});
+    spPlanet basePlanet = new Planet(gameResources, 150);
+    basePlanet->setGravity(10);
+//    basePlanet->setVelocity({1, 1});
+    addPlanet(basePlanet, getStage()->getSize() / 2);
+
+    spPlanet planet = new Planet(gameResources, 100);
+    planet->setGravity(100);
+    addPlanet(planet, getStage()->getSize() / 2 + Vector2{800, 0});
+
+//    planet = new Planet(gameResources, 300);
+//    planet->setGravity(10.0f);
+//    addPlanet(planet, getStage()->getSize() / 2 + Vector2{800, 500});
 
     player = new Player(gameResources);
     orbitWayNVG = new WayNVG(&gameResources);
@@ -84,19 +94,7 @@ Space::Space(Resources &gameResources, GlobalState *state) {
     addChild(player);
     getStage()->addChild(orbitWayNVG);
 
-    player->setPosition(planet->getPosition() + planet->getSize() + Vector2(-planet->radius, 0));
-
-    auto callback = [=](Event *event) {
-//        addAcceleration = spacePosition - player->getPosition();
-    };
-
-    getStage()->addEventListener(TouchEvent::TOUCH_DOWN, (const EventCallback &) [=](Event *event) {
-        auto touchEvent = dynamic_cast<TouchEvent *>(event);
-        if (touchEvent->getPointer()->isPressed(MouseButton_Left)) {
-            touchDown = true;
-            callback(event);
-        }
-    });
+    player->setPosition(basePlanet->getPosition() + basePlanet->getSize() + Vector2(-basePlanet->radius, 0));
 
     getStage()->addEventListener(TouchEvent::MOVE, (const EventCallback &) [=](Event *event) {
         auto touchEvent = dynamic_cast<TouchEvent *>(event);
@@ -105,11 +103,7 @@ Space::Space(Resources &gameResources, GlobalState *state) {
         pointerPosition = touchEvent->getPointer()->getPosition();
         spacePosition = global2local(pointerPosition);
 
-        if (touchDown) {
-            callback(event);
-        }
-
-        if (touchEvent->getPointer()->isPressed(MouseButton_Middle)) {
+        if (touchEvent->getPointer()->isPressed(MouseButton_Left)) {
             auto offset = lastPointerPosition - pointerPosition;
             setPosition(getPosition() - offset);
         }
@@ -160,7 +154,8 @@ void Space::showOrbit() {
     while (i < 10000) {
         acceleration = {0, 0};
         spPlanet collidedPlanet;
-        tie(playerPos, collidedPlanet) = getNextPosition(delta, playerPos, acceleration, velocity);
+        map<int, BodyInfo> bodyInfos;
+        tie(playerPos, collidedPlanet, bodyInfos) = getNextPosition(delta, playerPos, acceleration, velocity);
 
         if (collidedPlanet) {
             break;
@@ -175,14 +170,29 @@ void Space::showOrbit() {
 }
 
 
-tuple<Vector2, spPlanet>
+tuple<Vector2, spPlanet, map<int, BodyInfo>>
 Space::getNextPosition(double delta,
                        Vector2 objectPosition,
                        Vector2 &objectAcceleration,
                        Vector2 &objectVelocity) {
     spPlanet collidedPlanet;
+
+
+    vector<BodyInfo> bodyInfos(planets.size());
+    map<int, BodyInfo> bodyInfoMap;
+
     for (auto planet : planets) {
-        Vector2 planetPos = planet->getPosition();
+        bodyInfoMap.emplace(planet->getObjectID(), make_tuple(
+                planet->getPosition(),
+                planet->getVelocity(),
+                planet->getAcceleration()
+        ));
+    }
+
+    for (auto planet : planets) {
+        Vector2 planetPos, planetAcceleration, planetVelocity;
+        BodyInfo info = bodyInfoMap.at(planet->getObjectID());
+        tie(planetPos, planetAcceleration, planetVelocity) = info;
 
         auto direct = (planetPos - objectPosition).normalized();
         auto distance = (planetPos - objectPosition).length();
@@ -204,15 +214,21 @@ Space::getNextPosition(double delta,
             objectAcceleration += gravityVector;
 
             break;
-        } else {
         }
 
         objectAcceleration += gravityVector;
+
+        planetPos = planetPos + planetVelocity * delta;
+        planetAcceleration = {0, 0};
+        planetVelocity += planetAcceleration * delta;
+
+        bodyInfoMap.at(planet->getObjectID())
+                = make_tuple(planetPos, planetAcceleration, planetVelocity);
     }
     objectPosition = objectPosition + objectVelocity * delta;
     objectVelocity += objectAcceleration * delta;
 
-    return make_tuple(objectPosition, collidedPlanet);
+    return make_tuple(objectPosition, collidedPlanet, bodyInfoMap);
 }
 
 void Space::addPlanet(spPlanet planet, Vector2 position) {

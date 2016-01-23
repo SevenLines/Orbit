@@ -8,13 +8,18 @@
 #include <oxygine-framework.h>
 
 using namespace oxygine;
+using namespace std;
 
+typedef tuple<Vector2, Vector2, Vector2> BodyInfo;
 class Body : public Actor {
 public:
     Vector2 velocity;
     Vector2 acceleration;
-    Vector2 getNextPosition(float delta_time);
 
+    const Vector2 & getVelocity() const;
+    void setVelocity(const Vector2 &velocity);
+    const Vector2 & getAcceleration() const;
+    void setAcceleration(const Vector2 &acceleration);
 };
 typedef intrusive_ptr<Body> spBody;
 

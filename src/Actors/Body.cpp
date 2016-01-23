@@ -4,6 +4,18 @@
 
 #include "Body.h"
 
-Vector2 Body::getNextPosition(float delta_time) {
-    return getPosition() + velocity * delta_time;
+const Vector2 &Body::getVelocity() const {
+    return velocity;
+}
+
+void Body::setVelocity(const Vector2 &velocity) {
+    Body::velocity = velocity;
+}
+
+const Vector2 &Body::getAcceleration() const {
+    return acceleration;
+}
+
+void Body::setAcceleration(const Vector2 &acceleration) {
+    Body::acceleration = acceleration;
 }

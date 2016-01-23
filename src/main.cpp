@@ -11,6 +11,8 @@ You could start from example.cpp and example.h it has main functions being calle
 
 #include "game.h"
 #include "Helpers/types.h"
+#include <pthread.h>
+
 
 using namespace oxygine;
 
