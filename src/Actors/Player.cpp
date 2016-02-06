@@ -19,6 +19,7 @@ Player::Player(Resources &resources) : Rocket(resources) {
     style.hAlign = TextStyle::HALIGN_RIGHT;
 
     edtInfo->setStyle(style);
+    edtInfo->setPriority(100);
     getStage()->addChild(edtInfo);
 }
 

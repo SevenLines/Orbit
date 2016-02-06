@@ -35,6 +35,7 @@ int mainloop()
 
         core::swapDisplayBuffers();
     }
+    auto instance = STDRenderer::instance;
 
     //update internal components
     //all input events would be passed to Stage::instance.handleEvent
